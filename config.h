@@ -69,5 +69,5 @@ static const struct arg args[] = {
         { netspeed_tx, "%8s ↑ | ",      "wlo1" },
         { cpu_perc,    "CPU: %3s%% | ", NULL },
         { ram_perc,    "RAM: %3s%% | ", NULL },
-        { temp,        "%2s °C",        "/sys/class/thermal/thermal_zone1/temp" }
+        { temp,        "%2s °C",        "/sys/class/thermal/thermal_zone1/temp" },
 };
