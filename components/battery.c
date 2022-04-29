@@ -27,7 +27,7 @@
 	}
 
 	const char *
-	battery_perc(const char *bat)
+	battery(const char *bat)
 	{
 		int perc;
 		char path[PATH_MAX];
@@ -40,7 +40,28 @@
 			return NULL;
 		}
 
-		return bprintf("%d", perc);
+                if (perc >= 100)
+		    return bprintf("");
+                else if (perc >= 90)
+                    return bprintf("");
+                else if (perc >= 80)
+                    return bprintf("");
+                else if (perc >= 70)
+                    return bprintf("");
+                else if (perc >= 60)
+                    return bprintf("");
+                else if (perc >= 50)
+                    return bprintf("");
+                else if (perc >= 40)
+                    return bprintf("");
+                else if (perc >= 30)
+                    return bprintf("");
+                else if (perc >= 20)
+                    return bprintf("");
+                else if (perc >= 10)
+                    return bprintf("");
+                else
+                    return bprintf("");
 	}
 
 	const char *
@@ -50,9 +71,9 @@
 			char *state;
 			char *symbol;
 		} map[] = {
-			{ "Charging",    "+" },
-			{ "Discharging", "-" },
-			{ "Full",        "o" },
+			{ "Charging",    "" },
+			{ "Discharging", " " },
+			{ "Full",        " " },
 		};
 		size_t i;
 		char path[PATH_MAX], state[12];
