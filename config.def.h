@@ -12,11 +12,7 @@ static const char unknown_str[] = "n/a";
 /*
  * function            description                     argument (example)
  *
- * battery_perc        battery percentage              battery name (BAT0)
- *                                                     NULL on OpenBSD/FreeBSD
- * battery_state       battery charging state          battery name (BAT0)
- *                                                     NULL on OpenBSD/FreeBSD
- * battery_remaining   battery remaining HH:MM         battery name (BAT0)
+ * battery             battery icon                    battery name (BAT0)
  *                                                     NULL on OpenBSD/FreeBSD
  * cpu_perc            cpu usage in percent            NULL
  * cpu_freq            cpu frequency in MHz            NULL
@@ -69,7 +65,6 @@ static const struct arg args[] = {
         { netspeed_tx, "↑ %8s | ",      "wlo1" },
         { cpu_perc,    "CPU: %3s%% | ", NULL },
         { ram_perc,    "RAM: %3s%% | ", NULL },
-        { temp,        "%2s °C |",        "/sys/class/thermal/thermal_zone1/temp" },
-        { battery,     "%s",     "BAT1" },
-        { battery_state,"%s",     "BAT1" },
+        { temp,        "%2s °C | ",     "/sys/class/thermal/thermal_zone1/temp" },
+        { battery,     "%s",            "BAT1" },
 };
