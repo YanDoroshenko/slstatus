@@ -2,8 +2,9 @@
 
 /* battery */
 const char *battery(const char *);
-const char *battery_state(const char *);
-const char *battery_remaining(const char *);
+
+/* camera */
+const char *camera(const char *);
 
 /* cpu */
 const char *cpu_freq(void);

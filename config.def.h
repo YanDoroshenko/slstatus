@@ -13,7 +13,9 @@ static const char unknown_str[] = "n/a";
  * function            description                     argument (example)
  *
  * battery             battery icon                    battery name (BAT0)
- *                                                     NULL on OpenBSD/FreeBSD
+ *
+ * camera              camera icon                     camera name (video0)
+ *
  * cpu_perc            cpu usage in percent            NULL
  * cpu_freq            cpu frequency in MHz            NULL
  * datetime            date and time                   format string (%F %T)
@@ -61,10 +63,11 @@ static const char unknown_str[] = "n/a";
  */
 static const struct arg args[] = {
 	/* function format          argument */
-        { netspeed_rx, "↓ %8s | ",      "wlo1" },
-        { netspeed_tx, "↑ %8s | ",      "wlo1" },
-        { cpu_perc,    "CPU: %3s%% | ", NULL },
-        { ram_perc,    "RAM: %3s%% | ", NULL },
-        { temp,        "%2s °C | ",     "/sys/class/thermal/thermal_zone1/temp" },
-        { battery,     "%s",            "BAT1" },
+        { netspeed_rx, " %8s | ",   "wlo1" },
+        { netspeed_tx, " %8s | ",   "wlo1" },
+        { cpu_perc,    "﬙ %3s%% | ", NULL },
+        { ram_perc,    "﬘ %3s%% | ", NULL },
+        { temp,        "%2s °C | ",  "/sys/class/thermal/thermal_zone1/temp" },
+        { camera,      "%s",         "video0" },
+        { battery,     "%s",         "BAT1" },
 };
