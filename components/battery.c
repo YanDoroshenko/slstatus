@@ -8,6 +8,22 @@
 #include <stdint.h>
 #include <unistd.h>
 
+static const char * pick(const char *bat, const char *f1, const char *f2, char *path,
+        size_t length) {
+    if (esnprintf(path, length, f1, bat) > 0 &&
+            access(path, R_OK) == 0) {
+        return f1;
+    }
+
+    if (esnprintf(path, length, f2, bat) > 0 &&
+            access(path, R_OK) == 0) {
+        return f2;
+    }
+
+    return NULL;
+}
+
+
 const char * battery(const char *bat) {
     int perc;
     char capacity_path[PATH_MAX];
@@ -76,4 +92,46 @@ const char * battery(const char *bat) {
     else {
         return bprintf("");
     }
+}
+
+const char * battery_remaining(const char *bat) {
+    uintmax_t charge_now, current_now, m, h;
+    double timeleft;
+    char path[PATH_MAX], state[12];
+
+    if (esnprintf(path, sizeof(path),
+                "/sys/class/power_supply/%s/status", bat) < 0) {
+        return NULL;
+    }
+    if (pscanf(path, "%12s", state) != 1) {
+        return NULL;
+    }
+
+    if (!pick(bat, "/sys/class/power_supply/%s/charge_now",
+                "/sys/class/power_supply/%s/energy_now", path,
+                sizeof(path)) ||
+            pscanf(path, "%ju", &charge_now) < 0) {
+        return NULL;
+    }
+
+    if (!strcmp(state, "Discharging")) {
+        if (!pick(bat, "/sys/class/power_supply/%s/current_now",
+                    "/sys/class/power_supply/%s/power_now", path,
+                    sizeof(path)) ||
+                pscanf(path, "%ju", &current_now) < 0) {
+            return NULL;
+        }
+
+        if (current_now == 0) {
+            return NULL;
+        }
+
+        timeleft = (double)charge_now / (double)current_now;
+        h = timeleft;
+        m = (timeleft - (double)h) * 60;
+
+        return bprintf("%juh %2jum", h, m);
+    }
+
+    return "";
 }

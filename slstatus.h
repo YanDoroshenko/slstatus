@@ -2,6 +2,7 @@
 
 /* battery */
 const char *battery(const char *);
+const char *battery_remaining(const char *);
 
 /* camera */
 const char *camera(const char *);

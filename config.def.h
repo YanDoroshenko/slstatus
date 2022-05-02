@@ -70,4 +70,5 @@ static const struct arg args[] = {
         { temp,        "%2s °C | ",  "/sys/class/thermal/thermal_zone1/temp" },
         { camera,      "%s",         "video0" },
         { battery,     "%s",         "BAT1" },
+        { battery_remaining,     " %s",         "BAT1" },
 };
