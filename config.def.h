@@ -13,6 +13,7 @@ static const char unknown_str[] = "n/a";
  * function            description                     argument (example)
  *
  * battery             battery icon                    battery name (BAT0)
+ * battery_remaining   battery time remaining          battery name (BAT0)
  *
  * camera              camera icon                     camera name (video0)
  *
@@ -63,12 +64,12 @@ static const char unknown_str[] = "n/a";
  */
 static const struct arg args[] = {
 	/* function format          argument */
-        { netspeed_rx, " %8s | ",   "wlo1" },
+        { netspeed_rx, "  %8s | ",   "wlo1" },
         { netspeed_tx, " %8s | ",   "wlo1" },
         { cpu_perc,    "﬙ %3s%% | ", NULL },
         { ram_perc,    "﬘ %3s%% | ", NULL },
         { temp,        "%2s °C | ",  "/sys/class/thermal/thermal_zone1/temp" },
         { camera,      "%s",         "video0" },
         { battery,     "%s",         "BAT1" },
-        { battery_remaining,     " %s",         "BAT1" },
+        { battery_remaining,     "%s",         "BAT1" },
 };

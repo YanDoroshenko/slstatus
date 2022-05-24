@@ -130,7 +130,7 @@ const char * battery_remaining(const char *bat) {
         h = timeleft;
         m = (timeleft - (double)h) * 60;
 
-        return bprintf("%juh %2jum", h, m);
+        return bprintf("%2ju:%02ju", h, m);
     }
 
     return "";
