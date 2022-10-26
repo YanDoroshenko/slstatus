@@ -36,6 +36,7 @@ const char * battery(const char *bat) {
         return NULL;
     }
 
+<<<<<<< HEAD
     char status_path[PATH_MAX], state[12];
 
     if (esnprintf(status_path, sizeof(status_path),
