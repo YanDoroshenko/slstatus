@@ -2,27 +2,38 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../slstatus.h"
 #include "../util.h"
 
-#include <limits.h>
-#include <stdint.h>
-#include <unistd.h>
+#if defined(__linux__)
+/*
+ * https://www.kernel.org/doc/html/latest/power/power_supply_class.html
+ */
+	#include <limits.h>
+	#include <stdint.h>
+	#include <unistd.h>
 
-static const char * pick(const char *bat, const char *f1, const char *f2, char *path,
-        size_t length) {
-    if (esnprintf(path, length, f1, bat) > 0 &&
-            access(path, R_OK) == 0) {
-        return f1;
-    }
+	#define POWER_SUPPLY_CAPACITY "/sys/class/power_supply/%s/capacity"
+	#define POWER_SUPPLY_STATUS   "/sys/class/power_supply/%s/status"
+	#define POWER_SUPPLY_CHARGE   "/sys/class/power_supply/%s/charge_now"
+	#define POWER_SUPPLY_ENERGY   "/sys/class/power_supply/%s/energy_now"
+	#define POWER_SUPPLY_CURRENT  "/sys/class/power_supply/%s/current_now"
+	#define POWER_SUPPLY_POWER    "/sys/class/power_supply/%s/power_now"
 
-    if (esnprintf(path, length, f2, bat) > 0 &&
-            access(path, R_OK) == 0) {
-        return f2;
-    }
+	static const char *
+	pick(const char *bat, const char *f1, const char *f2, char *path,
+	     size_t length)
+	{
+		if (esnprintf(path, length, f1, bat) > 0 &&
+		    access(path, R_OK) == 0)
+			return f1;
+
+		if (esnprintf(path, length, f2, bat) > 0 &&
+		    access(path, R_OK) == 0)
+			return f2;
 
     return NULL;
 }
-
 
 const char * battery(const char *bat) {
     int perc;
@@ -36,7 +47,6 @@ const char * battery(const char *bat) {
         return NULL;
     }
 
-<<<<<<< HEAD
     char status_path[PATH_MAX], state[12];
 
     if (esnprintf(status_path, sizeof(status_path),
@@ -136,3 +146,138 @@ const char * battery_remaining(const char *bat) {
 
     return "";
 }
+
+#elif defined(__OpenBSD__)
+	#include <fcntl.h>
+	#include <machine/apmvar.h>
+	#include <sys/ioctl.h>
+	#include <unistd.h>
+
+	static int
+	load_apm_power_info(struct apm_power_info *apm_info)
+	{
+		int fd;
+
+		fd = open("/dev/apm", O_RDONLY);
+		if (fd < 0) {
+			warn("open '/dev/apm':");
+			return 0;
+		}
+
+		memset(apm_info, 0, sizeof(struct apm_power_info));
+		if (ioctl(fd, APM_IOC_GETPOWER, apm_info) < 0) {
+			warn("ioctl 'APM_IOC_GETPOWER':");
+			close(fd);
+			return 0;
+		}
+		return close(fd), 1;
+	}
+
+	const char *
+	battery_perc(const char *unused)
+	{
+		struct apm_power_info apm_info;
+
+		if (load_apm_power_info(&apm_info))
+			return bprintf("%d", apm_info.battery_life);
+
+		return NULL;
+	}
+
+	const char *
+	battery_state(const char *unused)
+	{
+		struct {
+			unsigned int state;
+			char *symbol;
+		} map[] = {
+			{ APM_AC_ON,      "+" },
+			{ APM_AC_OFF,     "-" },
+		};
+		struct apm_power_info apm_info;
+		size_t i;
+
+		if (load_apm_power_info(&apm_info)) {
+			for (i = 0; i < LEN(map); i++)
+				if (map[i].state == apm_info.ac_state)
+					break;
+
+			return (i == LEN(map)) ? "?" : map[i].symbol;
+		}
+
+		return NULL;
+	}
+
+	const char *
+	battery_remaining(const char *unused)
+	{
+		struct apm_power_info apm_info;
+		unsigned int h, m;
+
+		if (load_apm_power_info(&apm_info)) {
+			if (apm_info.ac_state != APM_AC_ON) {
+				h = apm_info.minutes_left / 60;
+				m = apm_info.minutes_left % 60;
+				return bprintf("%uh %02um", h, m);
+			} else {
+				return "";
+			}
+		}
+
+		return NULL;
+	}
+#elif defined(__FreeBSD__)
+	#include <sys/sysctl.h>
+
+	#define BATTERY_LIFE  "hw.acpi.battery.life"
+	#define BATTERY_STATE "hw.acpi.battery.state"
+	#define BATTERY_TIME  "hw.acpi.battery.time"
+
+	const char *
+	battery_perc(const char *unused)
+	{
+		int cap_perc;
+		size_t len;
+
+		len = sizeof(cap_perc);
+		if (sysctlbyname(BATTERY_LIFE, &cap_perc, &len, NULL, 0) < 0 || !len)
+			return NULL;
+
+		return bprintf("%d", cap_perc);
+	}
+
+	const char *
+	battery_state(const char *unused)
+	{
+		int state;
+		size_t len;
+
+		len = sizeof(state);
+		if (sysctlbyname(BATTERY_STATE, &state, &len, NULL, 0) < 0 || !len)
+			return NULL;
+
+		switch (state) {
+		case 0: /* FALLTHROUGH */
+		case 2:
+			return "+";
+		case 1:
+			return "-";
+		default:
+			return "?";
+		}
+	}
+
+	const char *
+	battery_remaining(const char *unused)
+	{
+		int rem;
+		size_t len;
+
+		len = sizeof(rem);
+		if (sysctlbyname(BATTERY_TIME, &rem, &len, NULL, 0) < 0 || !len
+		    || rem < 0)
+			return NULL;
+
+		return bprintf("%uh %02um", rem / 60, rem % 60);
+	}
+#endif
