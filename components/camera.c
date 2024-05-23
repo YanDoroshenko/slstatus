@@ -16,7 +16,7 @@ const char * camera(const char *cam) {
         return bprintf("");
     }
     else if (access(camera_path, R_OK) == 0) {
-        return bprintf(" ");
+        return bprintf("  ");
     }
     else {
         return bprintf("");

@@ -1,3 +1,4 @@
 *.o
+**/*.o
 slstatus
 config.h

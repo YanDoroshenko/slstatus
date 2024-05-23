@@ -57,51 +57,58 @@ const char * battery(const char *bat) {
         return NULL;
     }
 
-    if (strcmp("Discharging", state) == 0) {
+    if (strcmp("Discharging", state) == 0 || strcmp("Not", state) == 0) {
         if (perc >= 100)
-            return bprintf("");
+            return bprintf("󰁹");
         else if (perc >= 90)
-            return bprintf("");
+            return bprintf("󰂂");
         else if (perc >= 80)
-            return bprintf("");
+            return bprintf("󰂁");
         else if (perc >= 70)
-            return bprintf("");
+            return bprintf("󰂀");
         else if (perc >= 60)
-            return bprintf("");
+            return bprintf("󰁾");
         else if (perc >= 50)
-            return bprintf("");
+            return bprintf("󰁽");
         else if (perc >= 40)
-            return bprintf("");
+            return bprintf("󰁼");
         else if (perc >= 30)
-            return bprintf("");
+            return bprintf("󰁻");
         else if (perc >= 20)
-            return bprintf("");
+            return bprintf("󰁺");
         else if (perc >= 10)
-            return bprintf("");
+            return bprintf("󰁺");
         else
-            return bprintf("");
+            return bprintf("󰂃");
     }
     else if (strcmp("Charging", state) == 0) {
         if (perc >= 100)
-            return bprintf("");
+            return bprintf("󰂅");
         else if (perc >= 90)
-            return bprintf("");
+            return bprintf("󰂋");
         else if (perc >= 80)
-            return bprintf("");
+            return bprintf("󰂊");
+        else if (perc >= 70)
+            return bprintf("󰢞");
         else if (perc >= 60)
-            return bprintf("");
+            return bprintf("󰂉");
+        else if (perc >= 50)
+            return bprintf("󰢝");
         else if (perc >= 40)
-            return bprintf("");
+            return bprintf("󰂈");
         else if (perc >= 30)
-            return bprintf("");
+            return bprintf("󰂇");
+        else if (perc >= 20)
+            return bprintf("󰂆");
         else
-            return bprintf("");
+            return bprintf("󰢜");
     }
     else if (strcmp("Full", state) == 0) {
-        return bprintf("");
+        return bprintf("󰂄");
     }
     else {
-        return bprintf("");
+        //return bprintf("󰂑");
+        return bprintf(state);
     }
 }
 
